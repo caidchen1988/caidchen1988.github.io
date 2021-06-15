@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://caidchen1988.github.io</id>
     <title>菜刀陈</title>
-    <updated>2021-06-11T03:05:47.162Z</updated>
+    <updated>2021-06-15T03:37:24.009Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://caidchen1988.github.io"/>
     <link rel="self" href="https://caidchen1988.github.io/atom.xml"/>
@@ -10,6 +10,67 @@
     <logo>https://caidchen1988.github.io/images/avatar.png</logo>
     <icon>https://caidchen1988.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, 菜刀陈</rights>
+    <entry>
+        <title type="html"><![CDATA[面试一：StringBuffer 和 StringBuilder 区别]]></title>
+        <id>https://caidchen1988.github.io/post/mian-shi-yi-stringbuffer-he-stringbuilder-qu-bie/</id>
+        <link href="https://caidchen1988.github.io/post/mian-shi-yi-stringbuffer-he-stringbuilder-qu-bie/">
+        </link>
+        <updated>2021-06-15T02:51:20.000Z</updated>
+        <summary type="html"><![CDATA[<pre><code>面试官：StringBuilder和StringBuffer的区别在哪？
+我：StringBuilder不是线程安全的，StringBuffer是线程安全的
+面试官：那StringBuilder不安全的点在哪儿？
+我：。。。
+</code></pre>
+<p>StringBuffer 之间的最大不同在于 StringBuilder 的方法不是线程安全的。<br>
+由于 StringBuilder 相较于 StringBuffer 有速度优势，所以多数情况下建议使用 StringBuilder 类。</p>
+]]></summary>
+        <content type="html"><![CDATA[<pre><code>面试官：StringBuilder和StringBuffer的区别在哪？
+我：StringBuilder不是线程安全的，StringBuffer是线程安全的
+面试官：那StringBuilder不安全的点在哪儿？
+我：。。。
+</code></pre>
+<p>StringBuffer 之间的最大不同在于 StringBuilder 的方法不是线程安全的。<br>
+由于 StringBuilder 相较于 StringBuffer 有速度优势，所以多数情况下建议使用 StringBuilder 类。</p>
+<!-- more -->
+<h2 id="分析">分析</h2>
+<pre><code>public class StringBuilderDemo {
+
+    public static void main(String[] args) throws InterruptedException {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i &lt; 10; i++){
+            new Thread(() -&gt; {
+                for (int j = 0; j &lt; 1000; j++){
+                    stringBuilder.append(&quot;a&quot;);
+                }
+            }).start();
+        }
+
+        Thread.sleep(100);
+        System.out.println(stringBuilder.length());
+    }
+}
+</code></pre>
+<p>我们能看到这段代码创建了10个线程，每个线程循环1000次往StringBuilder对象里面append字符。正常情况下代码应该输出10000，但是实际运行会输出什么呢？</p>
+<figure data-type="image" tabindex="1"><img src="https://caidchen1988.github.io/post-images/1623727151708.png" alt="" loading="lazy"></figure>
+<p>我们看到输出了“9173”，小于预期的10000，并且还抛出了一个ArrayIndexOutOfBoundsException异常（异常不是必现）。</p>
+<p>1、为什么输出值跟预期值不一样</p>
+<p>我们先看一下StringBuilder.append()方法的实现，该方法调用父类AbstractStringBuilder的append()方法。</p>
+<figure data-type="image" tabindex="2"><img src="https://caidchen1988.github.io/post-images/1623727454186.png" alt="" loading="lazy"></figure>
+<p>先不管其他代码，<code>count += len;</code>就不是一个原子操作，多线程场景就会出现问题。</p>
+<p>2、为什么会抛出ArrayIndexOutOfBoundsException异常。</p>
+<p>我们看回AbstractStringBuilder的append()方法源码的<code>ensureCapacityInternal()</code>方法是检查StringBuilder对象的原char数组的容量能不能盛下新的字符串，如果盛不下就调用expandCapacity()方法对char数组进行扩容。<br>
+<img src="https://caidchen1988.github.io/post-images/1623727737533.png" alt="" loading="lazy"></p>
+<p>扩容的逻辑就是new一个新的char数组，新的char数组的容量是原来char数组的两倍再加2，再通过System.arryCopy()函数将原数组的内容复制到新数组，最后将指针指向新的char数组，问题就出在此处。</p>
+<p>假设现在有两个线程同时执行了StringBuilder的append()方法，两个线程都执行完了<code>ensureCapacityInternal()</code>方法，此刻count=5。</p>
+<figure data-type="image" tabindex="3"><img src="https://caidchen1988.github.io/post-images/1623727837407.png" alt="" loading="lazy"></figure>
+<p>这个时候线程1的cpu时间片用完了，线程2继续执行。线程2执行完整个append()方法后count变成6了<br>
+<img src="https://caidchen1988.github.io/post-images/1623727874323.png" alt="" loading="lazy"></p>
+<p>线程1继续执行的时候拿到的count值就是6了，执行char数组拷贝的时候就会抛出ArrayIndexOutOfBoundsException异常。</p>
+<p>3、StringBuffer用什么手段保证线程安全的？</p>
+<p>打开<code>append()</code>源码发现其实就是通过同步锁<code>synchronized</code>保证了线程安全。<br>
+<img src="https://caidchen1988.github.io/post-images/1623728134402.png" alt="" loading="lazy"></p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Java源码分析之线程池]]></title>
         <id>https://caidchen1988.github.io/post/java-yuan-ma-fen-xi-zhi-xian-cheng-chi/</id>
