@@ -6,7 +6,7 @@
 
 <title>面试二：Java SPI机制原理和应用 | 菜刀陈</title>
 
-<link rel="shortcut icon" href="https://caidchen1988.github.io/favicon.ico?v=1623827150684">
+<link rel="shortcut icon" href="https://caidchen1988.github.io/favicon.ico?v=1623827350941">
 
 <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://caidchen1988.github.io/styles/main.css">
@@ -85,7 +85,7 @@
             
         </div>
         <div style="text-align: center">
-            <form id="gridea-search-form" style="position: relative" data-update="1623827150684"
+            <form id="gridea-search-form" style="position: relative" data-update="1623827350941"
                 action="/search/">
                 <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
                 <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
@@ -244,7 +244,9 @@ Connection conn = DriverManager.getConnection(url,username,password);
 <p>当eclipse启动时，会遍历plugins文件夹中的目录，扫描每个插件的清单文件MANIFEST.MF，并建立一个内部模型来记录它所找到的每个插件的信息，就实现了动态添加新的插件。</p>
 <p>这也意味着是eclipse制定了一系列的规则，像是文件结构、类型、参数等。插件开发者遵循这些规则去开发自己的插件，eclipse并不需要知道插件具体是怎样开发的，只需要在启动的时候根据配置文件解析、加载到系统里就好了，是spi思想的一种体现。</p>
 <p><strong>4、SPI机制 - Spring中SPI机制</strong></p>
-<p>在springboot的自动装配过程中，最终会加载<code>META-INF/spring.factories</code>文件，而加载的过程是由SpringFactoriesLoader加载的。从CLASSPATH下的每个Jar包中搜寻所有<code>META-INF/spring.factories</code>配置文件，然后将解析properties文件，找到指定名称的配置后返回。需要注意的是，其实这里不仅仅是会去ClassPath路径下查找，会扫描所有路径下的Jar包，只不过这个文件只会在Classpath下的jar包中。</p>
+<p>在springboot的自动装配过程中，最终会加载<code>META-INF/spring.factories</code>文件，而加载的过程是由SpringFactoriesLoader加载的。</p>
+<p>从CLASSPATH下的每个Jar包中搜寻所有<code>META-INF/spring.factories</code>配置文件，然后将解析properties文件，找到指定名称的配置后返回。</p>
+<p>需要注意的是，其实这里不仅仅是会去ClassPath路径下查找，会扫描所有路径下的Jar包，只不过这个文件只会在Classpath下的jar包中。</p>
 <figure data-type="image" tabindex="4"><img src="https://caidchen1988.github.io/post-images/1623825524599.png" alt="" loading="lazy"></figure>
 <h2 id="四-spi和api的区别">四、SPI和API的区别</h2>
 <p><strong>SPI - “接口”位于“调用方”所在的“包”中</strong></p>
