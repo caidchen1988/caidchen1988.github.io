@@ -6,7 +6,7 @@
 
 <title>面试二：Java SPI机制原理和应用 | 菜刀陈</title>
 
-<link rel="shortcut icon" href="https://caidchen1988.github.io/favicon.ico?v=1623827350941">
+<link rel="shortcut icon" href="https://caidchen1988.github.io/favicon.ico?v=1623828052928">
 
 <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://caidchen1988.github.io/styles/main.css">
@@ -85,7 +85,7 @@
             
         </div>
         <div style="text-align: center">
-            <form id="gridea-search-form" style="position: relative" data-update="1623827350941"
+            <form id="gridea-search-form" style="position: relative" data-update="1623828052928"
                 action="/search/">
                 <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
                 <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
@@ -275,8 +275,8 @@ Connection conn = DriverManager.getConnection(url,username,password);
 <p>因为SPI机制中的有如上之缺陷，因此 Dubbo 就自己实现了一个 SPI，除了解决按需加载问题，增加了 IOC 和 AOP 的特性，还有个自适应扩展机制。</p>
 <p>我们先来看一下 Dubbo 对配置文件目录的约定，不同于 Java SPI ，Dubbo 分为了三类目录。</p>
 <ul>
-<li><code>META-INF/services/</code> 目录：该目录下的 SPI 配置文件是为了用来兼容 Java SPI 。<br>
--<code>META-INF/dubbo/</code> 目录：该目录存放用户自定义的 SPI 配置文件。</li>
+<li><code>META-INF/services/</code> 目录：该目录下的 SPI 配置文件是为了用来兼容 Java SPI 。</li>
+<li><code>META-INF/dubbo/</code> 目录：该目录存放用户自定义的 SPI 配置文件。</li>
 <li><code>META-INF/dubbo/internal/</code> 目录：该目录存放 Dubbo 内部使用的 SPI 配置文件。</li>
 </ul>
 <p><strong>Dubbo SPI 简单实例</strong></p>
