@@ -4,7 +4,7 @@
 <meta name="description" content="" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<title>多线程 | 菜刀陈</title>
+<title>Mysql高并发下优化设计——执行计划 | 菜刀陈</title>
 
 <link rel="shortcut icon" href="https://caidchen1988.github.io/favicon.ico?v=1623910105883">
 
@@ -33,11 +33,11 @@
 <!--<script src="media/scripts/index.js"></script>-->
 
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
 </head>
 <body>
 <div class="main gt-bg-theme-color-first">
-    <div class="main-content">
-        <nav class="navbar navbar-expand-lg">
+    <nav class="navbar navbar-expand-lg">
     <div class="navbar-brand">
         <img class="user-avatar" src="/images/avatar.png" alt="头像">
         <div class="site-name gt-c-content-color-first">
@@ -104,93 +104,93 @@
         }
     }
 </script>
-        <div class="current-tag-container">
-            <h2 class="title gt-c-content-color-first">
-                #多线程
-            </h2>
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    Mysql高并发下优化设计——执行计划
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2021-06-17 ·
+                    </time>
+                    
+                        <a href="https://caidchen1988.github.io/tag/HYHpZJhrr/" class="post-tags">
+                            # Mysql
+                        </a>
+                    
+                </div>
+                <div class="post-content">
+                    <h2 id="前言">前言</h2>
+<p>在实际数据库项目开发中，由于我们不知道实际查询时数据库里发生了什么，也不知道数据库是如何扫描表、如何使用索引的，因此，我们能感知到的就只有SQL语句的执行时间。尤其在数据规模比较大的场景下，如何写查询、优化查询、如何使用索引就显得很重要了。</p>
+<p>从整个Mysql查询过程中，可以对大家优化查询有一定的帮助，如图：<br>
+<img src="https://caidchen1988.github.io/post-images/1623895168430.jpg" alt="" loading="lazy"></p>
+<p>MySQL查询过程如下：<br>
+1.客户端将查询发送到MySQL服务器；<br>
+2.服务器先检查查询缓存，如果命中，立即返回缓存中的结果；否则进入下一阶段；<br>
+3.服务器对SQL进行解析、预处理，再由优化器生成对象的执行计划；<br>
+4.MySQL根据优化器生成的执行计划，调用存储引擎API来执行查询；<br>
+5.服务器将结果返回给客户端，同时缓存查询结果；</p>
+<h2 id="一-执行计划">一、执行计划</h2>
+<p><strong>什么是执行计划呢？</strong><br>
+执行计划，就是一条SQL语句，在数据库中实际执行的时候，一步步的分别都做了什么。<br>
+也就是我们用<code>EXPLAIN</code>分析一条SQL语句时展示出来的那些信息。<br>
+<img src="https://caidchen1988.github.io/post-images/1623895602278.png" alt="" loading="lazy"></p>
+<p><strong>执行计划中的列</strong><br>
+<img src="https://caidchen1988.github.io/post-images/1623895710929.png" alt="" loading="lazy"></p>
+<p>1、select_type列<br>
+<img src="https://caidchen1988.github.io/post-images/1623896259743.png" alt="" loading="lazy"></p>
+<p>2、type列<br>
+<img src="https://caidchen1988.github.io/post-images/1623896438688.png" alt="" loading="lazy"></p>
+<p>SQL查询优化中一个很重要的指标，依次从最差到最优：</p>
+<pre><code>ALL &lt; index &lt; range &lt; index_subquery &lt; unique_subquery &lt; index_merge &lt; ref_or_null &lt; fulltext &lt; ref &lt;  eq_ref &lt;   const  &lt; system
+</code></pre>
+
+                </div>
+            </article>
         </div>
-        <div class="post-list-container">
-    <div class="post-inner">
+
         
-            <div class="post gt-bg-theme-color-second">
-                <div class="post-left">
-                    <div>
-                        
-                        <a href="https://caidchen1988.github.io/post/mian-shi-yi-stringbuffer-he-stringbuilder-qu-bie/">
-                            <span class="post-title gt-c-content-color-first">面试一：StringBuffer 和 StringBuilder 区别</span>
-                        </a>
-                    </div>
-                    <div class="gt-post-content post-abstract gt-c-content-color-second">
-                        面试官：StringBuilder和StringBuffer的区别在哪？
-我：StringBuilder不是线程安全的，StringBuffer是线程安全的
-面试官：那StringBuilder不安全的点在哪儿？
-我：。。。
-
-StringBuffer 之间的最大不同在于 StringBuilder 的方法不是线程安全的。
-由于 StringBuilder 相较于 StringBuffer 有速度优势，所以多数情况下建议使用 StringBuilder 类。
-
-                    </div>
-                    <div class="post-info">
-                        <time class="post-time gt-c-content-color-first">
-                            发布于 · 2021-06-15 ·
-                        </time>
-                        
-                            <a href="https://caidchen1988.github.io/tag/exuiOuzmy/" class="post-tag">
-                                # Java
-                            </a>
-                        
-                            <a href="https://caidchen1988.github.io/tag/oo4uAi4od/" class="post-tag">
-                                # 多线程
-                            </a>
-                        
-                    </div>
-                </div>
-                
-                    <a href="https://caidchen1988.github.io/post/mian-shi-yi-stringbuffer-he-stringbuilder-qu-bie/" class="post-feature-image"
-                       style="background-image: url('https://caidchen1988.github.io/post-images/mian-shi-yi-stringbuffer-he-stringbuilder-qu-bie.png')">
-                    </a>
-                
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://caidchen1988.github.io/post/mian-shi-er-java-spi-ji-zhi-yuan-li-he-ying-yong/" class="post-title gt-a-link">
+                    面试二：Java SPI机制原理和应用
+                </a>
             </div>
         
-            <div class="post gt-bg-theme-color-second">
-                <div class="post-left">
-                    <div>
-                        
-                        <a href="https://caidchen1988.github.io/post/java-yuan-ma-fen-xi-zhi-xian-cheng-chi/">
-                            <span class="post-title gt-c-content-color-first">Java源码分析之线程池</span>
-                        </a>
-                    </div>
-                    <div class="gt-post-content post-abstract gt-c-content-color-second">
-                        
-                    </div>
-                    <div class="post-info">
-                        <time class="post-time gt-c-content-color-first">
-                            发布于 · 2021-06-11 ·
-                        </time>
-                        
-                            <a href="https://caidchen1988.github.io/tag/exuiOuzmy/" class="post-tag">
-                                # Java
-                            </a>
-                        
-                            <a href="https://caidchen1988.github.io/tag/oo4uAi4od/" class="post-tag">
-                                # 多线程
-                            </a>
-                        
-                    </div>
-                </div>
-                
-                    <a href="https://caidchen1988.github.io/post/java-yuan-ma-fen-xi-zhi-xian-cheng-chi/" class="post-feature-image"
-                       style="background-image: url('https://caidchen1988.github.io/post-images/java-yuan-ma-fen-xi-zhi-xian-cheng-chi.jpeg')">
-                    </a>
-                
-            </div>
+
         
-    </div>
-</div>
-        <div class="pagination-container">
-    
-    
-</div>
+
+        
+
+        
+            <script src='https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js'></script>
+
+<style>
+	div#vcomments{
+		width:100%;
+		max-width: 1000px;
+		padding: 2.5%
+	}
+</style>
+
+
+	<div id="vcomments"></div>
+
+<script>
+	new Valine({
+		el: '#vcomments',
+		appId: '',
+		appKey: '',
+		avatar: '',
+		pageSize: 5,
+		recordIp: false,
+		placeholder: 'Just Go Go',
+		visitor: false,
+	});
+</script>
+
+        
 
         <div class="site-footer gt-c-content-color-first">
     <div class="slogan gt-c-content-color-first">温故而知新</div>

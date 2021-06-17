@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://caidchen1988.github.io</id>
     <title>菜刀陈</title>
-    <updated>2021-06-16T07:21:00.188Z</updated>
+    <updated>2021-06-17T06:08:47.108Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://caidchen1988.github.io"/>
     <link rel="self" href="https://caidchen1988.github.io/atom.xml"/>
@@ -10,6 +10,38 @@
     <logo>https://caidchen1988.github.io/images/avatar.png</logo>
     <icon>https://caidchen1988.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, 菜刀陈</rights>
+    <entry>
+        <title type="html"><![CDATA[Mysql高并发下优化设计——执行计划]]></title>
+        <id>https://caidchen1988.github.io/post/mysql-gao-bing-fa-xia-you-hua-she-ji-yi/</id>
+        <link href="https://caidchen1988.github.io/post/mysql-gao-bing-fa-xia-you-hua-she-ji-yi/">
+        </link>
+        <updated>2021-06-17T01:49:47.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="前言">前言</h2>
+<p>在实际数据库项目开发中，由于我们不知道实际查询时数据库里发生了什么，也不知道数据库是如何扫描表、如何使用索引的，因此，我们能感知到的就只有SQL语句的执行时间。尤其在数据规模比较大的场景下，如何写查询、优化查询、如何使用索引就显得很重要了。</p>
+<p>从整个Mysql查询过程中，可以对大家优化查询有一定的帮助，如图：<br>
+<img src="https://caidchen1988.github.io/post-images/1623895168430.jpg" alt="" loading="lazy"></p>
+<p>MySQL查询过程如下：<br>
+1.客户端将查询发送到MySQL服务器；<br>
+2.服务器先检查查询缓存，如果命中，立即返回缓存中的结果；否则进入下一阶段；<br>
+3.服务器对SQL进行解析、预处理，再由优化器生成对象的执行计划；<br>
+4.MySQL根据优化器生成的执行计划，调用存储引擎API来执行查询；<br>
+5.服务器将结果返回给客户端，同时缓存查询结果；</p>
+<h2 id="一-执行计划">一、执行计划</h2>
+<p><strong>什么是执行计划呢？</strong><br>
+执行计划，就是一条SQL语句，在数据库中实际执行的时候，一步步的分别都做了什么。<br>
+也就是我们用<code>EXPLAIN</code>分析一条SQL语句时展示出来的那些信息。<br>
+<img src="https://caidchen1988.github.io/post-images/1623895602278.png" alt="" loading="lazy"></p>
+<p><strong>执行计划中的列</strong><br>
+<img src="https://caidchen1988.github.io/post-images/1623895710929.png" alt="" loading="lazy"></p>
+<p>1、select_type列<br>
+<img src="https://caidchen1988.github.io/post-images/1623896259743.png" alt="" loading="lazy"></p>
+<p>2、type列<br>
+<img src="https://caidchen1988.github.io/post-images/1623896438688.png" alt="" loading="lazy"></p>
+<p>SQL查询优化中一个很重要的指标，依次从最差到最优：</p>
+<pre><code>ALL &lt; index &lt; range &lt; index_subquery &lt; unique_subquery &lt; index_merge &lt; ref_or_null &lt; fulltext &lt; ref &lt;  eq_ref &lt;   const  &lt; system
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[面试二：Java SPI机制原理和应用]]></title>
         <id>https://caidchen1988.github.io/post/mian-shi-er-java-spi-ji-zhi-yuan-li-he-ying-yong/</id>
@@ -511,38 +543,6 @@ if(order.status != null) {
 <li>上面我们讲到的超时时间可以直接利用Redis本身的ttl实现</li>
 </ul>
 <p>当然Redis存储的数据可靠性、一致性等方面是不如MySQL的，需要用户自己取舍。</p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Hello Gridea]]></title>
-        <id>https://caidchen1988.github.io/post/hello-gridea/</id>
-        <link href="https://caidchen1988.github.io/post/hello-gridea/">
-        </link>
-        <updated>2018-12-11T16:00:00.000Z</updated>
-        <summary type="html"><![CDATA[<p>👏  欢迎使用 <strong>Gridea</strong> ！<br>
-✍️  <strong>Gridea</strong> 一个静态博客写作客户端。你可以用它来记录你的生活、心情、知识、笔记、创意... ...</p>
-]]></summary>
-        <content type="html"><![CDATA[<p>👏  欢迎使用 <strong>Gridea</strong> ！<br>
-✍️  <strong>Gridea</strong> 一个静态博客写作客户端。你可以用它来记录你的生活、心情、知识、笔记、创意... ...</p>
-<!-- more -->
-<p><a href="https://github.com/getgridea/gridea">Github</a><br>
-<a href="https://gridea.dev/">Gridea 主页</a><br>
-<a href="http://fehey.com/">示例网站</a></p>
-<h2 id="特性">特性👇</h2>
-<p>📝  你可以使用最酷的 <strong>Markdown</strong> 语法，进行快速创作</p>
-<p>🌉  你可以给文章配上精美的封面图和在文章任意位置插入图片</p>
-<p>🏷️  你可以对文章进行标签分组</p>
-<p>📋  你可以自定义菜单，甚至可以创建外部链接菜单</p>
-<p>💻  你可以在 <strong>Windows</strong>，<strong>MacOS</strong> 或 <strong>Linux</strong> 设备上使用此客户端</p>
-<p>🌎  你可以使用 <strong>𝖦𝗂𝗍𝗁𝗎𝖻 𝖯𝖺𝗀𝖾𝗌</strong> 或 <strong>Coding Pages</strong> 向世界展示，未来将支持更多平台</p>
-<p>💬  你可以进行简单的配置，接入 <a href="https://github.com/gitalk/gitalk">Gitalk</a> 或 <a href="https://github.com/SukkaW/DisqusJS">DisqusJS</a> 评论系统</p>
-<p>🇬🇧  你可以使用<strong>中文简体</strong>或<strong>英语</strong></p>
-<p>🌁  你可以任意使用应用内默认主题或任意第三方主题，强大的主题自定义能力</p>
-<p>🖥  你可以自定义源文件夹，利用 OneDrive、百度网盘、iCloud、Dropbox 等进行多设备同步</p>
-<p>🌱 当然 <strong>Gridea</strong> 还很年轻，有很多不足，但请相信，它会不停向前 🏃</p>
-<p>未来，它一定会成为你离不开的伙伴</p>
-<p>尽情发挥你的才华吧！</p>
-<p>😘 Enjoy~</p>
 ]]></content>
     </entry>
 </feed>
