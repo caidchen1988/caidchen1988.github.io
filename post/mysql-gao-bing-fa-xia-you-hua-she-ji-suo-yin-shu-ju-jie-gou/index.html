@@ -1,0 +1,271 @@
+<html>
+<head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>Mysql高并发下优化设计——索引数据结构 | 菜刀陈</title>
+
+<link rel="shortcut icon" href="https://caidchen1988.github.io/favicon.ico?v=1624287461076">
+
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://caidchen1988.github.io/styles/main.css">
+<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css"> -->
+
+<style>
+    hr {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        border: 0;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dockerfile.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dart.min.js"></script>
+
+<!-- <script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script> -->
+<!-- DEMO JS -->
+<!--<script src="media/scripts/index.js"></script>-->
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
+</head>
+<body>
+<div class="main gt-bg-theme-color-first">
+    <nav class="navbar navbar-expand-lg">
+    <div class="navbar-brand">
+        <img class="user-avatar" src="/images/avatar.png" alt="头像">
+        <div class="site-name gt-c-content-color-first">
+            菜刀陈
+        </div>
+    </div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" id="changeNavbar">
+        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav mr-auto" style="text-align: center">
+            
+            <div class="nav-item">
+                
+                <a href="/" class="menu gt-a-link">
+                    首页
+                </a>
+                
+            </div>
+            
+            <div class="nav-item">
+                
+                <a href="/archives" class="menu gt-a-link">
+                    归档
+                </a>
+                
+            </div>
+            
+            <div class="nav-item">
+                
+                <a href="/tags" class="menu gt-a-link">
+                    标签
+                </a>
+                
+            </div>
+            
+            <div class="nav-item">
+                
+                <a href="/post/about" class="menu gt-a-link">
+                    关于
+                </a>
+                
+            </div>
+            
+        </div>
+        <div style="text-align: center">
+            <form id="gridea-search-form" style="position: relative" data-update="1624287461076"
+                action="/search/">
+                <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
+                <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
+            </form>
+        </div>
+    </div>
+</nav>
+<script>
+    /* 移动端导航栏展开/收起切换 */
+    document.getElementById('changeNavbar').onclick = () => {
+        var element = document.getElementById('navbarSupportedContent');
+        if (element.style.display === 'none' || element.style.display === '') {
+            element.style.display = 'block';
+        } else {
+            element.style.display = 'none';
+        }
+    }
+</script>
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    Mysql高并发下优化设计——索引数据结构
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2021-06-18 ·
+                    </time>
+                    
+                        <a href="https://caidchen1988.github.io/tag/HYHpZJhrr/" class="post-tags">
+                            # Mysql
+                        </a>
+                    
+                </div>
+                <div class="post-content">
+                    <h2 id="前言">前言</h2>
+<p>一般提升查询效率的最直接有效的办法就是优化索引，那么如何优化索引才能提升查询效率呢，我们就需要了解底层结构，工作原理。</p>
+<h2 id="数据结构">数据结构</h2>
+<p>我们知道索引和实际的数据都是存储在磁盘中（前提：存储引擎是innodb、myISAM等），在进行数据读取的时候回优先把索引加载到内存中。</p>
+<p>我们的索引存储在磁盘中，索引优化从根上来说就是解决磁盘IO问题，那么怎么解决呢，从2方面处理，第一方面<code>减少IO量</code>，另一方面<code>减少IO次数</code>。</p>
+<p><strong>磁盘预读</strong></p>
+<p>内存跟磁盘进行交互的时候最小的逻辑单位，这个单位称为页（datapage），一般是4K或8K，由操作系统决定，我们在进行数据读取的时候，一般回读取页的整数倍，也就是4K，8K，16K，innodb存储引擎在进行数据加载的时候读取的是16K数据。</p>
+<!-- more -->
+<p>我们知道mysql5.x之后默认存储引擎是innodb，索引数据是以B+树的方式存储的，那么思考下为什么是B+树？</p>
+<p>那么我们分析下还有那些数据结构可以用于索引呢，具体如下：</p>
+<p><strong>Hash表</strong></p>
+<p>散列表（Hash table，也叫哈希表），是根据键（Key）而直接访问在内存存储位置的数据结构。也就是说，它通过计算一个关于键值的函数，将所需查询的数据映射到表中一个位置来访问记录，这加快了查找速度。这个映射函数称做散列函数，存放记录的数组称做散列表。</p>
+<p>假设：有一本中文词典，里面包含了所有的汉字，但是这些汉字是按任意顺序随意排版的，那么想要在其中找到某一个汉字，你就需要从头至尾一个一个核查，如果运气差，这个汉字正好在词典的末尾，那你需要遍历整本词典才能找到你要查的汉字。</p>
+<p>优化：因为汉字和拼音之间存在着一种确定的关系，为了提高查找速度，现在将所有汉字按照拼音（key）进行排序（拼音可以根据首字母，第二个字母依次进一步排序），并且每个拼音都有一个对应页码（index），从该页开始，存放拼音对应的汉字（value）。所以找到拼音，也就能在对应的页码找到对应的汉字。其中，拼音和页码之间，有着某种固定的映射关系，可以通过某种方式计算出来（hash function）。</p>
+<p>缺点：放在同一页码（具有相同拼音）的汉字可能不止一个（同音字），这时候通过拼音（key）获取到的汉字（value）应该是哪个呢？这就出现了碰撞（hash collision）。</p>
+<p>总结：散列表的好处是散列查询单条数据比较快，但是坏处也比较多，会导致hash碰撞，hash冲突，导致数据散列不均匀，当需要进行范围查找的时候需要挨个便利，效率比较低。<br>
+<img src="https://caidchen1988.github.io/post-images/1623987119977.png" alt="" loading="lazy"></p>
+<p><strong>二叉树</strong></p>
+<p>有且仅有2个节点，并且是有序的，<br>
+缺点：当需要向这些数据插入更多数据的时候，会导致当前树变的非常深，增加读取次数，之前我们也说过，要提升查询效率要解决的就是IO问题，所以不适合作为索引的数据结构。<br>
+<img src="https://caidchen1988.github.io/post-images/1623987019491.jpeg" alt="" loading="lazy"></p>
+<p><strong>B 树</strong><br>
+B树是二叉树的升级版，又叫平衡多路查找树。它和平衡二叉树的区别在于：</p>
+<ol>
+<li>平衡二叉树最多两个子树，而 B 树每个节点都可以有多个子树，M 阶 B 树表示每个节点最多有M个子树。</li>
+<li>平衡二叉树每个节点只有一个数据和两个指向孩子的指针，而 B 树每个中间节点有 k-1 个关键字（可以理解为数据）和 k 个子树（ k 介于阶数 M 和 M/2 之间，M/2 向上取整）。</li>
+<li>所有叶子节点均在同一层、叶子节点除了包含关键字和关键字记录的指针外也有指向其子节点的指针，只不过其指针地址都为 null 。<br>
+<img src="https://caidchen1988.github.io/post-images/1623987652624.png" alt="" loading="lazy"></li>
+</ol>
+<p><strong>问题：3层B树可以存多少数据？</strong><br>
+假设1条数据1KB，我们知道innoDB存储引擎中1页可以存放16KB的数据，大概可以存放16条数据，所以3层B树大概可以存储16<em>16</em>16=4096条数据。<br>
+那么如果想存储更多数据怎么办，目前看只能加层数，多加1层数据，那么增加了IO次数，降低了效率。</p>
+<p><strong>B+ 树</strong><br>
+B+树是在B树的基础上演化而来的，我们就说不同点，只有叶子节点才有data域，叶子节点包含所有的数据，叶子节点通过指针链接形成双向链表。<br>
+<img src="https://caidchen1988.github.io/post-images/1623989197922.png" alt="" loading="lazy"></p>
+<p><strong>问题：3层B+树可以存多少数据？</strong><br>
+同样假设1条数据1KB，主键id为bigint类型，长度8字节，指针大小设置为6字节，那么一页可以存储16384/14=1170，也就是说1页可以存储1170个指针，那么高度为3层的数据结构可以存放1170<em>1170</em>16=21902400条记录。</p>
+<p><strong>问题：选择索引时候，选择int还是varchar?</strong></p>
+<p>从上可知我们建立索引的时候索引指针占用的空间尽可能的少，因为int占用4个字节，所以这个问题需要看varchar是占用几个字节来判断，如果varchar(3)就选择varchar，varchar(5)就选择int。</p>
+<p><strong>问题：表中的有个字段是一个varchar(100)类型的，那么最优的方式去创建索引呢？</strong></p>
+<p>这个时候我们就需要用到前缀索引来帮助我们尽可能少的占用空间，具体怎么截取前缀呢。<br>
+假设我们有一张表citydemo, 给city创建前缀索引，统计下重复数据出现次数，如图：<br>
+<img src="https://caidchen1988.github.io/post-images/1623990350563.png" alt="" loading="lazy"></p>
+<p>那么我们就截取前3位看下重复数据的次数，如图：<br>
+<img src="https://caidchen1988.github.io/post-images/1623990464681.png" alt="" loading="lazy"></p>
+<p>循环往复提高截取的位数，通过重复次数和原始统计出得重复次数是否相近来判断是否最优。<br>
+<img src="https://caidchen1988.github.io/post-images/1623990619055.png" alt="" loading="lazy"></p>
+<p>最后创建索引：</p>
+<pre><code>alter table citydemo add key(city(7));
+</code></pre>
+<h2 id="聚簇索引">聚簇索引</h2>
+<p>数据和索引存储在一起就叫聚簇索引，没有存储在一起叫做非聚簇索引。</p>
+<p>innodb存储引擎在进行数据插入的时候，数据必须要跟某一个索引列存储在一起，这个索引可以是主键，如果没有主键，选择唯一键，如果没有唯一建，选择6字节的rowid来进行存储。</p>
+<p>数据必定是跟某一个索引绑定在一起的，绑定数据的索引就叫做聚簇索引，其他索引的叶子结点中存储的数据不再是整行的记录，而是聚簇索引的id值。</p>
+<pre><code>例如：
+id,name,age,gender
+id主键，name普通索引，id是聚簇索引，name对应的索引的B+树上的叶子节点存储的就是id值
+</code></pre>
+<h1 id="回表">回表</h1>
+<p>什么是回表</p>
+<h1 id="索引覆盖">索引覆盖</h1>
+<h1 id="最左匹配原则">最左匹配原则</h1>
+<h1 id="索引下推">索引下推</h1>
+
+                </div>
+            </article>
+        </div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://caidchen1988.github.io/post/mysql-gao-bing-fa-xia-you-hua-she-ji-yi/" class="post-title gt-a-link">
+                    Mysql高并发下优化设计——执行计划
+                </a>
+            </div>
+        
+
+        
+
+        
+
+        
+            <script src='https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js'></script>
+
+<style>
+	div#vcomments{
+		width:100%;
+		max-width: 1000px;
+		padding: 2.5%
+	}
+</style>
+
+
+	<div id="vcomments"></div>
+
+<script>
+	new Valine({
+		el: '#vcomments',
+		appId: '',
+		appKey: '',
+		avatar: '',
+		pageSize: 5,
+		recordIp: false,
+		placeholder: 'Just Go Go',
+		visitor: false,
+	});
+</script>
+
+        
+
+        <div class="site-footer gt-c-content-color-first">
+    <div class="slogan gt-c-content-color-first">温故而知新</div>
+    <div class="social-container">
+        
+            
+                <a href="https://github.com/caidchen1988" target="_blank">
+                    <i class="fab fa-github gt-c-content-color-first"></i>
+                </a>
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+    </div>
+    <div class="footer-info">
+        Powered by <a href="https://github.com/caidchen1988" target="_blank">Caidchen</a>
+    </div>
+    <div>
+        Theme by <a href="https://imhanjie.com/" target="_blank">imhanjie</a>, Powered by <a
+                href="https://github.com/getgridea/gridea" target="_blank">Gridea | <a href="https://caidchen1988.github.io/atom.xml" target="_blank">RSS</a></a>
+    </div>
+</div>
+
+<script>
+  hljs.highlightAll()
+</script>
+
+    </div>
+</div>
+</body>
+</html>

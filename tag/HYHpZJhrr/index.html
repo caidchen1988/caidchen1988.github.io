@@ -6,7 +6,7 @@
 
 <title>Mysql | 菜刀陈</title>
 
-<link rel="shortcut icon" href="https://caidchen1988.github.io/favicon.ico?v=1623910105883">
+<link rel="shortcut icon" href="https://caidchen1988.github.io/favicon.ico?v=1624287461076">
 
 <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://caidchen1988.github.io/styles/main.css">
@@ -85,7 +85,7 @@
             
         </div>
         <div style="text-align: center">
-            <form id="gridea-search-form" style="position: relative" data-update="1623910105883"
+            <form id="gridea-search-form" style="position: relative" data-update="1624287461076"
                 action="/search/">
                 <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
                 <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
@@ -111,6 +111,42 @@
         </div>
         <div class="post-list-container">
     <div class="post-inner">
+        
+            <div class="post gt-bg-theme-color-second">
+                <div class="post-left">
+                    <div>
+                        
+                        <a href="https://caidchen1988.github.io/post/mysql-gao-bing-fa-xia-you-hua-she-ji-suo-yin-shu-ju-jie-gou/">
+                            <span class="post-title gt-c-content-color-first">Mysql高并发下优化设计——索引数据结构</span>
+                        </a>
+                    </div>
+                    <div class="gt-post-content post-abstract gt-c-content-color-second">
+                        前言
+一般提升查询效率的最直接有效的办法就是优化索引，那么如何优化索引才能提升查询效率呢，我们就需要了解底层结构，工作原理。
+数据结构
+我们知道索引和实际的数据都是存储在磁盘中（前提：存储引擎是innodb、myISAM等），在进行数据读取的时候回优先把索引加载到内存中。
+我们的索引存储在磁盘中，索引优化从根上来说就是解决磁盘IO问题，那么怎么解决呢，从2方面处理，第一方面减少IO量，另一方面减少IO次数。
+磁盘预读
+内存跟磁盘进行交互的时候最小的逻辑单位，这个单位称为页（datapage），一般是4K或8K，由操作系统决定，我们在进行数据读取的时候，一般回读取页的整数倍，也就是4K，8K，16K，innodb存储引擎在进行数据加载的时候读取的是16K数据。
+
+                    </div>
+                    <div class="post-info">
+                        <time class="post-time gt-c-content-color-first">
+                            发布于 · 2021-06-18 ·
+                        </time>
+                        
+                            <a href="https://caidchen1988.github.io/tag/HYHpZJhrr/" class="post-tag">
+                                # Mysql
+                            </a>
+                        
+                    </div>
+                </div>
+                
+                    <a href="https://caidchen1988.github.io/post/mysql-gao-bing-fa-xia-you-hua-she-ji-suo-yin-shu-ju-jie-gou/" class="post-feature-image"
+                       style="background-image: url('https://caidchen1988.github.io/post-images/mysql-gao-bing-fa-xia-you-hua-she-ji-suo-yin-shu-ju-jie-gou.jpeg')">
+                    </a>
+                
+            </div>
         
             <div class="post gt-bg-theme-color-second">
                 <div class="post-left">
