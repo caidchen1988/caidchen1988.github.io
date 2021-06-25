@@ -6,7 +6,7 @@
 
 <title>Mysql高并发下优化设计——索引数据结构 | 菜刀陈</title>
 
-<link rel="shortcut icon" href="https://caidchen1988.github.io/favicon.ico?v=1624287461076">
+<link rel="shortcut icon" href="https://caidchen1988.github.io/favicon.ico?v=1624616430920">
 
 <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://caidchen1988.github.io/styles/main.css">
@@ -85,7 +85,7 @@
             
         </div>
         <div style="text-align: center">
-            <form id="gridea-search-form" style="position: relative" data-update="1624287461076"
+            <form id="gridea-search-form" style="position: relative" data-update="1624616430920"
                 action="/search/">
                 <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
                 <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
@@ -123,6 +123,7 @@
                 <div class="post-content">
                     <h2 id="前言">前言</h2>
 <p>一般提升查询效率的最直接有效的办法就是优化索引，那么如何优化索引才能提升查询效率呢，我们就需要了解底层结构，工作原理。</p>
+<!-- more -->
 <h2 id="数据结构">数据结构</h2>
 <p>我们知道索引和实际的数据都是存储在磁盘中（前提：存储引擎是innodb、myISAM等），在进行数据读取的时候回优先把索引加载到内存中。</p>
 <p>我们的索引存储在磁盘中，索引优化从根上来说就是解决磁盘IO问题，那么怎么解决呢，从2方面处理，第一方面<code>减少IO量</code>，另一方面<code>减少IO次数</code>。</p>
