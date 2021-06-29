@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://caidchen1988.github.io</id>
     <title>菜刀陈</title>
-    <updated>2021-06-25T10:25:59.393Z</updated>
+    <updated>2021-06-29T08:13:16.376Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://caidchen1988.github.io"/>
     <link rel="self" href="https://caidchen1988.github.io/atom.xml"/>
@@ -11,7 +11,142 @@
     <icon>https://caidchen1988.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, 菜刀陈</rights>
     <entry>
-        <title type="html"><![CDATA[Java GC基础知识]]></title>
+        <title type="html"><![CDATA[JVM系列 —— JMM内存模型]]></title>
+        <id>https://caidchen1988.github.io/post/jvm-xi-lie-nei-cun-mo-xing/</id>
+        <link href="https://caidchen1988.github.io/post/jvm-xi-lie-nei-cun-mo-xing/">
+        </link>
+        <updated>2021-06-29T03:43:36.000Z</updated>
+        <summary type="html"><![CDATA[<h2 id="前言">前言</h2>
+<pre><code>本文以Sun HotPot虚拟机为例
+</code></pre>
+<p><strong>Java内存区域</strong>是指 JVM运行时将数据分区域存储 ，简单的说就是不同的数据放在不同的地方。通常又叫 <strong>运行时数据区域</strong>。</p>
+<p><strong>Java内存模型（JMM）</strong> 定义了程序中各个变量的访问规则，即在虚拟机中将变量存储到内存和从内存中取出变量这样的底层细节。</p>
+<h2 id="一-java内存区域">一、Java内存区域</h2>
+<p>JDK1.6~1.8的变化</p>
+<figure data-type="image" tabindex="1"><img src="https://caidchen1988.github.io/post-images/1624946109422.png" alt="" loading="lazy"></figure>
+<p>JDK1.8之前</p>
+<figure data-type="image" tabindex="2"><img src="https://caidchen1988.github.io/post-images/1624947777004.png" alt="" loading="lazy"></figure>
+<p>JDK1.8（含）之后</p>
+<figure data-type="image" tabindex="3"><img src="https://caidchen1988.github.io/post-images/1624947819674.png" alt="" loading="lazy"></figure>
+<p>最大的区别就是JDK 1.8有一个<strong>元空间</strong>替代<strong>方法区</strong>。</p>
+<p>那么为什么JDK1.8 中永久代（PermGen）会被HotSpot VM移除？</p>
+<ol>
+<li>由于 PermGen 内存经常会溢出，引发恼人的 java.lang.OutOfMemoryError: PermGen，因此 JVM 的开发者希望这一块内存可以更灵活地被管理，不要再经常出现这样的 OOM</li>
+<li>移除 PermGen 可以促进 HotSpot JVM 与 JRockit VM 的融合，因为 JRockit 没有永久代。</li>
+</ol>
+<h2 id="二-jmm各区域介绍">二、JMM各区域介绍</h2>
+<p><strong>1、程序计数器</strong></p>
+<pre><code>程序计数器是一块很小的内存空间，它是线程私有的，可以认作为当前线程的行号指示器。
+</code></pre>
+<p>为什么需要程序计数器？</p>
+<p>对于一个处理器(如果是多核cpu那就是一核)，在一个确定的时刻都只会执行一条线程中的指令，一条线程中有多个指令，为了线程切换可以恢复到正确执行位置，每个线程都需有独立的一个程序计数器，不同线程之间的程序计数器互不影响，独立存储。</p>
+<p>注意：如果线程执行的是个java方法，那么计数器记录虚拟机字节码指令的地址。如果为native【底层方法】，那么计数器为空。这块内存区域是虚拟机规范中唯一没有OutOfMemoryError的区域。</p>
+<p>如图，左侧是它的程序计数器对应的行号。<br>
+<img src="https://caidchen1988.github.io/post-images/1624952314272.png" alt="" loading="lazy"></p>
+<ul>
+<li>这些行号每一个都会对应一条需要执行的字节码指令，是压栈还是弹出或是执行计算。</li>
+<li>之所以说是线程私有的，因为如果不是私有的，那么整个计算过程最终的结果也将错误。</li>
+</ul>
+]]></summary>
+        <content type="html"><![CDATA[<h2 id="前言">前言</h2>
+<pre><code>本文以Sun HotPot虚拟机为例
+</code></pre>
+<p><strong>Java内存区域</strong>是指 JVM运行时将数据分区域存储 ，简单的说就是不同的数据放在不同的地方。通常又叫 <strong>运行时数据区域</strong>。</p>
+<p><strong>Java内存模型（JMM）</strong> 定义了程序中各个变量的访问规则，即在虚拟机中将变量存储到内存和从内存中取出变量这样的底层细节。</p>
+<h2 id="一-java内存区域">一、Java内存区域</h2>
+<p>JDK1.6~1.8的变化</p>
+<figure data-type="image" tabindex="1"><img src="https://caidchen1988.github.io/post-images/1624946109422.png" alt="" loading="lazy"></figure>
+<p>JDK1.8之前</p>
+<figure data-type="image" tabindex="2"><img src="https://caidchen1988.github.io/post-images/1624947777004.png" alt="" loading="lazy"></figure>
+<p>JDK1.8（含）之后</p>
+<figure data-type="image" tabindex="3"><img src="https://caidchen1988.github.io/post-images/1624947819674.png" alt="" loading="lazy"></figure>
+<p>最大的区别就是JDK 1.8有一个<strong>元空间</strong>替代<strong>方法区</strong>。</p>
+<p>那么为什么JDK1.8 中永久代（PermGen）会被HotSpot VM移除？</p>
+<ol>
+<li>由于 PermGen 内存经常会溢出，引发恼人的 java.lang.OutOfMemoryError: PermGen，因此 JVM 的开发者希望这一块内存可以更灵活地被管理，不要再经常出现这样的 OOM</li>
+<li>移除 PermGen 可以促进 HotSpot JVM 与 JRockit VM 的融合，因为 JRockit 没有永久代。</li>
+</ol>
+<h2 id="二-jmm各区域介绍">二、JMM各区域介绍</h2>
+<p><strong>1、程序计数器</strong></p>
+<pre><code>程序计数器是一块很小的内存空间，它是线程私有的，可以认作为当前线程的行号指示器。
+</code></pre>
+<p>为什么需要程序计数器？</p>
+<p>对于一个处理器(如果是多核cpu那就是一核)，在一个确定的时刻都只会执行一条线程中的指令，一条线程中有多个指令，为了线程切换可以恢复到正确执行位置，每个线程都需有独立的一个程序计数器，不同线程之间的程序计数器互不影响，独立存储。</p>
+<p>注意：如果线程执行的是个java方法，那么计数器记录虚拟机字节码指令的地址。如果为native【底层方法】，那么计数器为空。这块内存区域是虚拟机规范中唯一没有OutOfMemoryError的区域。</p>
+<p>如图，左侧是它的程序计数器对应的行号。<br>
+<img src="https://caidchen1988.github.io/post-images/1624952314272.png" alt="" loading="lazy"></p>
+<ul>
+<li>这些行号每一个都会对应一条需要执行的字节码指令，是压栈还是弹出或是执行计算。</li>
+<li>之所以说是线程私有的，因为如果不是私有的，那么整个计算过程最终的结果也将错误。</li>
+</ul>
+<!-- more -->
+<p><strong>2、Java虚拟机栈</strong></p>
+<p>每一个方法在执行的同时，都会创建出一个栈帧，用于存放局部变量表、操作数栈、动态链接、方法出口、线程等信息。<br>
+方法从调用到执行完成，都对应着栈帧从虚拟机中入栈和出栈的过程。<br>
+最终，栈帧会随着方法的创建到结束而销毁。</p>
+<figure data-type="image" tabindex="4"><img src="https://caidchen1988.github.io/post-images/1624952604408.png" alt="" loading="lazy"></figure>
+<p>整个这段流程，就是方法的调用和返回。在调用过程申请了操作数栈的深度和局部变量的大小。<br>
+以及相应的信息从各个区域获取并操作，其实也就是入栈和出栈的过程。</p>
+<p><strong>2.1、局部变量表</strong></p>
+<p>局部变量表是存放方法参数和局部变量的区域。</p>
+<p>全局变量是放在堆的，有两次赋值的阶段，一次在类加载的准备阶段，赋予系统初始值；另外一次在类加载的初始化阶段，赋予代码定义的初始值。</p>
+<p>而局部变量没有赋初始值是不能使用的。</p>
+<p><strong>2.2、操作数栈</strong></p>
+<p>一个先入后出的栈。</p>
+<p>当一个方法刚刚开始执行的时候，这个方法的操作数栈是空的，在方法的执行过程中，会有各种字节码指令往操作数栈中写入和提取内容，也就是出栈/入栈操作。</p>
+<p><strong>2.3、动态连接</strong></p>
+<p>每个栈帧都包含一个指向运行时常量池中该栈帧所属方法的引用。持有这个引用是为了支持方法调用过程中的动态连接(Dynamic Linking)。</p>
+<p>常量池可以便于指令的识别</p>
+<pre><code>public void methodA(){
+    
+}
+public void methodB(){
+    methodA();//methodB()调用methodA(),先找到调用methodA()的版本符号，再变为直接引用
+}
+</code></pre>
+<p>方法调用并不等同于方法执行，方法调用阶段唯一的任务就是确定被调用方法的版本(即调用哪一个方法)，这也是Java强大的扩展能力，在运行期间才能确定目标方法的直接引用。</p>
+<p>所有方法调用中的目标方法在Class文件里面都是一个常量池中的符号引用，在类加载的解析阶段，会将其中的一部分符号引用转化为直接引用。</p>
+<p><strong>2.4、方法返回地址</strong></p>
+<p>返回分为 正常返回 和 异常退出。</p>
+<p>无论何种退出情况，都将返回至方法当前被调用的位置，这也程序才能继续执行。</p>
+<p>一般来说，方法正常退出时，调用者的PC计数器的值可以作为返回地址，栈帧中会保存这个计数器值。</p>
+<p>方法退出的过程相当于弹出当前栈帧。</p>
+<p><strong>3、本地方法栈</strong></p>
+<ul>
+<li>本地方法栈与Java虚拟机栈作用类似，唯一不同的就是本地方法栈执行的是Native方法，而虚拟机栈是为JVM执行Java方法服务的。</li>
+<li>另外，与 Java 虚拟机栈一样，本地方法栈也会抛出 StackOverflowError 和 OutOfMemoryError 异常。</li>
+<li>JDK1.8 HotSpot虚拟机直接就把本地方法栈和虚拟机栈合二为一。</li>
+</ul>
+<p><strong>4、堆和元空间</strong></p>
+<figure data-type="image" tabindex="5"><img src="https://caidchen1988.github.io/post-images/1624953790858.png" alt="" loading="lazy"></figure>
+<ul>
+<li>
+<p>JDK 1.8 JVM 的内存结构主要由三大块组成：堆内存、元空间和栈，Java 堆是内存空间占据最大的一块区域。</p>
+</li>
+<li>
+<p>Java 堆，由年轻代和年老代组成，分别占据1/3和2/3。</p>
+</li>
+<li>
+<p>而年轻代又分为三部分，Eden、From Survivor（S0）、To Survivor（S1），占据比例为8:1:1，可调。</p>
+</li>
+<li>
+<p>另外这里我们特意画出了元空间，也就是直接内存区域。在 JDK 1.8 之后就不在堆上分配方法区了。</p>
+</li>
+<li>
+<p><strong>元空间</strong>从虚拟机Java堆中转移到本地内存，默认情况下，元空间的大小仅受本地内存的限制，说白了也就是以后不会因为永久代空间不够而抛出OOM异常出现了。jdk1.8以前版本的 class和JAR包数据存储在 PermGen下面 ，PermGen 大小是固定的，而且项目之间无法共用，公有的 class，所以比较容易出现OOM异常。</p>
+</li>
+<li>
+<p>升级 JDK 1.8后，元空间配置参数，<code>-XX:MetaspaceSize=512M XX:MaxMetaspaceSize=1024M</code>。教你个小技巧通过jps、jinfo查看元空间，如下：</p>
+<p>jinfo -flag MetaspaceSize <pid></p>
+</li>
+</ul>
+<figure data-type="image" tabindex="6"><img src="https://caidchen1988.github.io/post-images/1624954291901.png" alt="" loading="lazy"></figure>
+<p><strong>5、常量池</strong></p>
+<p>从 JDK 1.7开始把常量池从永久代中剥离，直到 JDK1.8 去掉了永久代。而字符串常量池一直放在堆空间，用于存储字符串对象，或是字符串对象的引用。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[JVM系列 —— GC算法、垃圾收集器]]></title>
         <id>https://caidchen1988.github.io/post/java-gc-ji-chu-zhi-shi/</id>
         <link href="https://caidchen1988.github.io/post/java-gc-ji-chu-zhi-shi/">
         </link>

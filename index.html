@@ -6,7 +6,7 @@
 
 <title>菜刀陈</title>
 
-<link rel="shortcut icon" href="https://caidchen1988.github.io/favicon.ico?v=1624616430920">
+<link rel="shortcut icon" href="https://caidchen1988.github.io/favicon.ico?v=1624954385341">
 
 <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://caidchen1988.github.io/styles/main.css">
@@ -85,7 +85,7 @@
             
         </div>
         <div style="text-align: center">
-            <form id="gridea-search-form" style="position: relative" data-update="1624616430920"
+            <form id="gridea-search-form" style="position: relative" data-update="1624954385341"
                 action="/search/">
                 <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
                 <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
@@ -112,8 +112,72 @@
                 <div class="post-left">
                     <div>
                         
+                        <a href="https://caidchen1988.github.io/post/jvm-xi-lie-nei-cun-mo-xing/">
+                            <span class="post-title gt-c-content-color-first">JVM系列 —— JMM内存模型</span>
+                        </a>
+                    </div>
+                    <div class="gt-post-content post-abstract gt-c-content-color-second">
+                        前言
+本文以Sun HotPot虚拟机为例
+
+Java内存区域是指 JVM运行时将数据分区域存储 ，简单的说就是不同的数据放在不同的地方。通常又叫 运行时数据区域。
+Java内存模型（JMM） 定义了程序中各个变量的访问规则，即在虚拟机中将变量存储到内存和从内存中取出变量这样的底层细节。
+一、Java内存区域
+JDK1.6~1.8的变化
+
+JDK1.8之前
+
+JDK1.8（含）之后
+
+最大的区别就是JDK 1.8有一个元空间替代方法区。
+那么为什么JDK1.8 中永久代（PermGen）会被HotSpot VM移除？
+
+由于 PermGen 内存经常会溢出，引发恼人的 java.lang.OutOfMemoryError: PermGen，因此 JVM 的开发者希望这一块内存可以更灵活地被管理，不要再经常出现这样的 OOM
+移除 PermGen 可以促进 HotSpot JVM 与 JRockit VM 的融合，因为 JRockit 没有永久代。
+
+二、JMM各区域介绍
+1、程序计数器
+程序计数器是一块很小的内存空间，它是线程私有的，可以认作为当前线程的行号指示器。
+
+为什么需要程序计数器？
+对于一个处理器(如果是多核cpu那就是一核)，在一个确定的时刻都只会执行一条线程中的指令，一条线程中有多个指令，为了线程切换可以恢复到正确执行位置，每个线程都需有独立的一个程序计数器，不同线程之间的程序计数器互不影响，独立存储。
+注意：如果线程执行的是个java方法，那么计数器记录虚拟机字节码指令的地址。如果为native【底层方法】，那么计数器为空。这块内存区域是虚拟机规范中唯一没有OutOfMemoryError的区域。
+如图，左侧是它的程序计数器对应的行号。
+
+
+这些行号每一个都会对应一条需要执行的字节码指令，是压栈还是弹出或是执行计算。
+之所以说是线程私有的，因为如果不是私有的，那么整个计算过程最终的结果也将错误。
+
+
+                    </div>
+                    <div class="post-info">
+                        <time class="post-time gt-c-content-color-first">
+                            发布于 · 2021-06-29 ·
+                        </time>
+                        
+                            <a href="https://caidchen1988.github.io/tag/QY2JJaZTr/" class="post-tag">
+                                # JVM
+                            </a>
+                        
+                            <a href="https://caidchen1988.github.io/tag/exuiOuzmy/" class="post-tag">
+                                # Java
+                            </a>
+                        
+                    </div>
+                </div>
+                
+                    <a href="https://caidchen1988.github.io/post/jvm-xi-lie-nei-cun-mo-xing/" class="post-feature-image"
+                       style="background-image: url('https://caidchen1988.github.io/post-images/jvm-xi-lie-nei-cun-mo-xing.png')">
+                    </a>
+                
+            </div>
+        
+            <div class="post gt-bg-theme-color-second">
+                <div class="post-left">
+                    <div>
+                        
                         <a href="https://caidchen1988.github.io/post/java-gc-ji-chu-zhi-shi/">
-                            <span class="post-title gt-c-content-color-first">Java GC基础知识</span>
+                            <span class="post-title gt-c-content-color-first">JVM系列 —— GC算法、垃圾收集器</span>
                         </a>
                     </div>
                     <div class="gt-post-content post-abstract gt-c-content-color-second">
